@@ -5,6 +5,21 @@ phases:
     commands:
       - aws cloudformation package --template-file template.yml --s3-bucket aws-serverless-experiment
                                    --output-template-file template-output.yml
+  pre_build:
+    commands:
+      - echo Installing npm dependencies...
+      - npm install
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Running tests...
+      - npm test
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
 artifacts:
   files:
     - template-output.yml
