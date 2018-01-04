@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Outputs the current time
+
+Parameters:
+  DATABASE_URI:
+    Type: String
+
 Resources:
   TimeFunction:
     Type: AWS::Serverless::Function
@@ -14,3 +19,6 @@ Resources:
           Properties:
             Path: /Time
             Method: GET
+      Environment:
+        Variables:
+          DATABASE_URI: !Sub '${DATABASE_URI}'
