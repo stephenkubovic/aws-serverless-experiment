@@ -3,13 +3,11 @@ version: 0.2
 phases:
   install:
     commands:
-      - aws cloudformation package --template-file template.yml --s3-bucket aws-serverless-experiment
-                                   --output-template-file template-output.yml
-  pre_build:
-    commands:
       - echo Installing npm dependencies...
       - npm install
-
+      - echo Creating Cloudformation package...
+      - aws cloudformation package --template-file template.yml --s3-bucket aws-serverless-experiment
+                                   --output-template-file template-output.yml
   build:
     commands:
       - echo Build started on `date`
