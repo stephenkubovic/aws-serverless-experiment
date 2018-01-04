@@ -4,6 +4,8 @@ const knex = require('knex')({
 })
 
 exports.handler = (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false
+
   console.log('DATABASE_URI', process.env.DATABASE_URI)
 
   knex
