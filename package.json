@@ -20,5 +20,9 @@
   "homepage": "https://github.com/stephenkubovic/aws-serverless-experiment#readme",
   "devDependencies": {
     "ava": "^0.24.0"
+  },
+  "dependencies": {
+    "knex": "^0.14.2",
+    "pg": "^7.4.0"
   }
 }
