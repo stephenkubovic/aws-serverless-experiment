@@ -3,8 +3,9 @@ Transform: AWS::Serverless-2016-10-31
 Description: Outputs the current time
 
 Parameters:
-  DATABASE_URI:
-    Type: String
+  DatabaseUri:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: /CodeBuild/DATABASE_URI
 
 Resources:
   TimeFunction:
@@ -21,4 +22,4 @@ Resources:
             Method: GET
       Environment:
         Variables:
-          DATABASE_URI: !Sub '${DATABASE_URI}'
+          DATABASE_URI: !Sub '${DatabaseUri}'
