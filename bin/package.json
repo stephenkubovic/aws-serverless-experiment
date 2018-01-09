@@ -1,0 +1,13 @@
+{
+  "name": "aws-serverless-experiment-bin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "authorize.js",
+  "author": "Stephen Kubovic",
+  "private": true,
+  "license": "UNLICENSED",
+  "dependencies": {
+    "amazon-cognito-identity-js": "^1.29.0",
+    "aws-sdk": "^2.179.0"
+  }
+}

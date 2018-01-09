@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  SecretToken:
+    NoEcho: true
+    Type: String
+  NodeEnvironment:
+    Type: String
+
+Resources:
+  InfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: rest-api.zip
+      Events:
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: InfoApi
+            Path: /
+            Method: ANY
+      Environment:
+        Variables:
+          SECRET_TOKEN:
+            Ref: SecretToken
+          NODE_ENV:
+            Ref: NodeEnvironment
+
+  InfoApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: InfoApi
+      StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        basePath: /prod
+        info:
+          title: InfoApi
+        schemes:
+          - https
+        paths:
+          /:
+            x-amazon-apigateway-any-method:
+              produces:
+                - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+                - CognitoAuthorizer: []
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: 200
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${InfoFunction.Arn}/invocations"
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+
+            options:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                '200':
+                  descrpition: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: 200
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                passthroughBehavior: when_no_match
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                type: mock
+
+        securityDefinitions:
+          CognitoAuthorizer:
+            type: apiKey
+            name: x-amz-security-token
+            in: header
+            x-amazon-apigateway-authtype: cognito_user_pools
+            x-amazon-apigateway-authorizer:
+              providerARNs:
+                - !GetAtt InfoApiUserPool.Arn
+              type: cognito_user_pools
+
+        definitions:
+          Empty:
+            type: object
+            title: Empty Schema
+
+  InfoApiUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: InfoApiUserPool

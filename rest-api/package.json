@@ -1,0 +1,20 @@
+{
+  "name": "rest-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "author": "Stephen Kubovic <skubovic@gmail.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "aws-serverless-express": "^3.0.2",
+    "express": "^4.16.2",
+    "lodash.get": "^4.4.2"
+  },
+  "devDependencies": {
+    "ava": "^0.24.0",
+    "supertest": "^3.0.0"
+  }
+}
