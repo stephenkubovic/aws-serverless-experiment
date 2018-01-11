@@ -7,6 +7,9 @@ Parameters:
     Type: String
   NodeEnvironment:
     Type: String
+  DatabaseStackName:
+    Type: String
+    Default: InfraDatabaseStack
 
 Resources:
 
@@ -32,6 +35,9 @@ Resources:
             Ref: SecretToken
           NODE_ENV:
             Ref: NodeEnvironment
+          DATABASE_CONNECTION_STRING:
+            Fn::ImportValue:
+              Fn::Sub: "${DatabaseStackName}-DBConnectionString"
 
   InfoApi:
     Type: AWS::Serverless::Api
