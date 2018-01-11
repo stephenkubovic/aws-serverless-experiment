@@ -1,4 +1,5 @@
 .DS_Store
 node_modules
 infrastructure-output.yml
+database-output.yml
 *.zip
