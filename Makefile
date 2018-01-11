@@ -1,8 +1,14 @@
+BUILD_API = cd ./rest-api && npm install && cd ../ && zip -rq rest-api.zip rest-api
+BUILD_HELLOWORLD = cd ./hello-world && npm install && cd ../ && zip -rq hello-world.zip hello-world
+
 build:
 	@echo "Building rest-api package....."; \
-	cd ./rest-api && npm install && cd ../ && zip -rq rest-api.zip rest-api
+	$(BUILD_API); \
 
-package: build
+	@echo "Building hello-world package....."; \
+	$(BUILD_HELLOWORLD)
+
+package:
 	@echo "Packaging CloudFormation template....."; \
 	aws cloudformation package \
 		--template-file ./infrastructure.yml \
@@ -10,7 +16,7 @@ package: build
 		--output-template-file infrastructure-output.yml \
 		--profile ${AWS_PROFILE}
 
-deploy: package
+deploy:
 	@echo "Deploying CloudFormation package....."; \
 	aws cloudformation deploy \
 		--template-file ./infrastructure-output.yml \

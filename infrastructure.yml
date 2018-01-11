@@ -14,7 +14,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
-      CodeUri: rest-api.zip
+      CodeUri: ./rest-api
       Events:
         ProxyApiRoot:
           Type: Api
@@ -29,6 +29,67 @@ Resources:
             Ref: SecretToken
           NODE_ENV:
             Ref: NodeEnvironment
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  StatesExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: StatesExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt [ LambdaExecutionRole, Arn ]
+      CodeUri: ./hello-world
+      Runtime: nodejs6.10
+      Timeout: 5
+
+  MyStateMachine:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Properties:
+      DefinitionString:
+        !Sub
+          - |-
+            {
+              "StartAt": "HelloWorld",
+              "States": {
+                "HelloWorld": {
+                  "Type": "Task",
+                  "Resource": "${lambdaArn}",
+                  "End": true
+                }
+              }
+            }
+          - {lambdaArn: !GetAtt [ HelloWorldFunction, Arn ]}
+      RoleArn: !GetAtt [ StatesExecutionRole, Arn ]
 
   InfoApi:
     Type: AWS::Serverless::Api
